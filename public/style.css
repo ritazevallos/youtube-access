@@ -1,0 +1,59 @@
+svg {
+  text-align: center;
+}
+
+td{
+  text-align: left;
+}
+
+path {
+  stroke: #fff;
+  fill-rule: evenodd;
+}
+
+text {
+  font-family: Arial;
+  font-size: 1em;
+  color: #fff !important;
+}
+
+#view_as{
+  text-align:center;
+}
+
+#container{
+  text-align: center;
+  position: relative;
+}
+
+.vertical-align {
+  display: flex;
+  align-items: center;
+}
+
+#text-container{
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:100%;
+  height:100%;
+  z-index: 1;
+  display: flex;
+  align-items: center;  
+  justify-content: center;
+}
+
+#explanation {
+/*  position: absolute;
+  top: 305px;
+  left:395px;*/
+  text-align: center;
+  width: 140px;
+  color: #666;
+}
+#genre_name{
+  font-weight: bold
+}
+#percentage {
+  font-size: 2.5em;
+}

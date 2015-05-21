@@ -1,0 +1,14 @@
+{
+  "global": {
+    "parseVersion": "1.4.2"
+  },
+  "applications": {
+    "YoutubeAccessibilityVisualization": {
+      "applicationId": "5ObGqjM7hqEobYaUiiyb6pQsjvXEkyVoxXwIXtHQ",
+      "masterKey": "SJnddVF2SUK5tYQzobWWUYNn5MuCteRR65rxDQRy"
+    },
+    "_default": {
+      "link": "YoutubeAccessibilityVisualization"
+    }
+  }
+}
