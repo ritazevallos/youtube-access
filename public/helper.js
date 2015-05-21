@@ -1,5 +1,5 @@
 /* assume only for one day? */
-function drawTable(results){
+function drawTable(cat_counts){
 
 	$('svg').remove();
 	$('text-container').hide();
@@ -26,9 +26,9 @@ function drawTable(results){
 	var total_captioned = 0;
 	var total = 0;
 
-	for (var i=0; i<results.length; i++){
-		cat = results[i].toJSON();
-		cat_name = cat['cat_name'];
+	for (var i=0; i<cat_counts.length; i++){
+		cat = cat_counts[i];
+		cat_name = cat['title'];
 		num_captioned = cat['num_captioned'];
 		num_not_captioned = cat['num_not_captioned'];
 		total += num_captioned + num_not_captioned;

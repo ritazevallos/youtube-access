@@ -23,11 +23,13 @@ function getData(date, next_date, display_type){
         // got results from database.
         console.log(count+" items match the query.");
 
+        var cat_counts = convertDBresultsToCatCounts(results);
+
         if (display_type == "d3graph"){
-          var d3_json = convertDatabaseResultsToD3(results); 
+          var d3_json = convertCatCountsToD3(cat_counts);
           drawVisualization(d3_json, 700, 500);
         } else if (display_type == "table"){
-          drawTable(results);
+          drawTable(cat_counts);
         } else {
           alert('Error in getData: display_type not of valid form [d3graph, table]');
         }
@@ -64,7 +66,7 @@ function putCatCountsInDatabase(cat_counts,date){
 function updateAfterAPICall(cat_counts, date){
 
   // display data
-  var d3_json = convertAPIResultsForD3(cat_counts);
+  var d3_json = convertCatCountsToD3(cat_counts);
   drawVisualization(d3_json, 700, 500);
 
   putCatCountsInDatabase(cat_counts,date)
@@ -135,13 +137,13 @@ function callAPIforDate(date, next_date){
   cat_counts = [];
   
   // making this a dictionary so it's passed by reference
-  num_completed = { 'completed' : 0, 'total' : 2*clean_cats.length };
+  num_completed = { 'completed' : 0, 'total' : 2*Object.keys(clean_cats).length };
 
-  for (var i=0;i<clean_cats.length;i++){
+  for (var title in clean_cats){
     cat_counts.push({});
-    var cat_id = clean_cats[i]['id'];
+    var cat_id = clean_cats[title];
     cat_counts[i]['id'] = cat_id;
-    cat_counts[i]['title'] = clean_cats[i]['title'];
+    cat_counts[i]['title'] = title;
     cat_counts[i]['num_captioned'] = 0;
     cat_counts[i]['num_not_captioned'] = 0;
 
@@ -152,7 +154,7 @@ function callAPIforDate(date, next_date){
 
 }
 
-/* convertAPIResultsForD3 - 
+/* convertCatCountsToD3 - 
     Transforms a dictionary of the form
 
       [ 
@@ -187,7 +189,7 @@ function callAPIforDate(date, next_date){
         ]
       }
 */
-function convertAPIResultsForD3(cat_counts){
+function convertCatCountsToD3(cat_counts){
   d3_dict = {};
   d3_dict['name']='flare';
   d3_dict['children'] = [];
@@ -211,37 +213,33 @@ function convertAPIResultsForD3(cat_counts){
   return JSON.stringify(d3_dict);
 }
 
+/* important in case there are multiple dates in the results */
 
-function convertDatabaseResultsToD3(results){ 
-  //todo: ASSUMING SINGLE DATE
-  d3_dict = {};
-  d3_dict['name']='flare';
-  d3_dict['children'] = [];
+function convertDBresultsToCatCounts(results){
   
   console.log('database query results:');
-  for (i=0; i<results.length; i++){
 
-    cat = results[i].toJSON();
-    console.log(cat);
-
-    item = {
-      'name': cat['cat_name']
-    };
-    item['children'] = [ 
-      {
-        'name': 'with annotations',
-        'size': cat['num_captioned']
-      },
-      {
-        'name': 'without annotations',
-        'size': cat['num_not_captioned']
-      }
-    ]
-    d3_dict['children'].push(item);
+  var cat_counts = [];
+  var cc_indices = {}; // initialize a map between cat names and indices in the cat_counts array
+  
+  // initialize cat_counts
+  for (var i=0; i<Object.keys(clean_cats).length; i++){
+    var title = Object.keys(clean_cats)[i];
+    cc_indices[title] = i;
+    cat_counts.push({});
+    cat_counts[i]['title'] = title;
+    cat_counts[i]['id'] = clean_cats[title];
+    cat_counts[i]['num_captioned'] = 0;
+    cat_counts[i]['num_not_captioned'] = 0;
   }
 
-  console.log('todo: verify that we are still showing the correct date');
+  for (var i=0; i<results.length; i++){
+    var result = results[i].toJSON();
+    console.log(result);
+    var index = cc_indices[result['cat_name']];
+    cat_counts[index]['num_captioned'] += result['num_captioned'];
+    cat_counts[index]['num_not_captioned'] += result['num_not_captioned'];
+  }
 
-  return JSON.stringify(d3_dict);
-
+  return cat_counts;
 }
