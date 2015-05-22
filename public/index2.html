@@ -15,6 +15,7 @@
 <script src="helper.js"></script>
 <script src="data_collecting.js"></script>
 <script src="cat_counts.js"></script>
+<script src="chart_canvas.js"></script>
 
 
 <script>
@@ -62,6 +63,8 @@ function checkAndGetDataForInput(){
         drawVisualization(d3_json, 700, 500);
       } else if (display_type == "table"){
         drawTable(cat_counts);
+      } else if (display_type == "chartjs"){
+        drawChart(cat_counts);
       } else {
         alert('Error in getData: display_type not of valid form [d3graph, table]');
       }
@@ -98,10 +101,12 @@ $(function(){
     checkAndGetDataForInput();
   })
 
-  $('input[name=viewAsOptions').change(function(){
+  $('input[name=viewAsOptions]').change(function(){
     $('#container').fadeTo('slow', 0.20);
     checkAndGetDataForInput();
   })
+
+
 
   checkAndGetDataForInput();
 
@@ -144,6 +149,9 @@ $(function(){
       <label class="radio-inline">
         <input type="radio" name="viewAsOptions" id="table" value="table" > Table
       </label>
+      <label class="radio-inline">
+        <input type="radio" name="viewAsOptions" id="chart" value="chartjs" > ChartJS Graph
+      </label>
     </div>
 
   <div class="row vertical-align">
@@ -161,6 +169,7 @@ $(function(){
           </div>
           <!-- the D3 svg gets appended here -->
         </div>
+        <canvas id="myChart" width="400" height="400"></canvas>
       </div>  
 
     </div>

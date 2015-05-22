@@ -10,7 +10,8 @@ function drawTable(cat_counts){
 		.addClass('table')
 		.addClass('table-condensed')
 		.addClass('table-responsive')
-		.addClass('table-hover');
+		.addClass('table-hover')
+		.attr('id', 'tableid')
 
 	$table
 		.append("<center><caption><h2>Percent Captioned Videos By Category</h2></caption></center>")
