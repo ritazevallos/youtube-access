@@ -57,3 +57,68 @@ function drawTable(cat_counts){
 	$('#container').append($table);
     $('#container').fadeTo('slow', 1.0);
 }
+
+
+
+
+
+
+
+/* convertCatCountsToD3 - 
+    Transforms a dictionary of the form
+
+      [ 
+        {
+          'id': 1,
+          'title': 'Animation',
+          'num_captioned': '14',
+          'num_not_captioned': '20'
+        },
+        ...
+      ]
+
+    into a JSON object of the form
+      
+      {
+        "name":"flare",
+        "children": [
+          {
+            "name":"Film & Animation",
+            "children":[
+              {
+                "name":"with annotations",
+                "size":590
+              },
+              {
+                "name":"without annotations",
+                "size":5579
+              }
+            ]
+          },
+          ...
+        ]
+      }
+*/
+function convertCatCountsToD3(cat_counts){
+  d3_dict = {};
+  d3_dict['name']='flare';
+  d3_dict['children'] = [];
+  for (i=0; i<cat_counts.length; i++){
+    cat = cat_counts[i];
+    item = {
+      'name': cat['title']
+    };
+    item['children'] = [ 
+      {
+        'name': 'with annotations',
+        'size': cat['num_captioned']
+      },
+      {
+        'name': 'without annotations',
+        'size': cat['num_not_captioned']
+      }
+    ]
+    d3_dict['children'].push(item);
+  }
+  return JSON.stringify(d3_dict);
+}

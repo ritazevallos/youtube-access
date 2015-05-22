@@ -9,32 +9,35 @@ function getData(date, next_date){
   query.equalTo("date",date);
 
   //query.lessThan("date",next_date);
-  query.find({
-    success: function(results){
-      var num_results = results.length;
-      console.log("Successfully checked database for date range "+date+" - "+next_date+".")
-      if (num_results == 0){
-        console.log("0 items match the query. Will query API instead and store data.");  
-        
-        // get the data, draw visualization when done and store in database
-        var cat_counts = callAPIforDate(date,next_date);
+  var queryPromise = query.find();
 
-        putCatCountsInDatabase(cat_counts,date);
-        return cat_counts;
-        
-      } else {
-        // got results from database.
-        console.log(num_results+" items match the query.");
+  queryPromise.done(function(results){
+    var num_results = results.length;
+    console.log("Successfully checked database for date range "+date+" - "+next_date+".")
+    if (num_results == 0){
+      console.log("0 items match the query. Will query API instead and store data.");  
+      
+      // get the data, draw visualization when done and store in database
+      var cat_counts = callAPIforDate(date,next_date);
 
-        var cat_counts = convertDBresultsToCatCounts(results);
-        return cat_counts;
+      putCatCountsInDatabase(cat_counts,date);
+      return cat_counts;
+      
+    } else {
+      // got results from database.
+      console.log(num_results+" items match the query.");
 
-      }
-    },
-    error: function(error){
-      alert("Error: " + error.code + " " + error.message);
+      var cat_counts = convertDBresultsToCatCounts(results);
+      console.log(JSON.stringify(cat_counts));
+      return cat_counts;
+
+
     }
   });
+
+  queryPromise.fail(function(error){
+    throw "Error: " + error.code + " " + error.message;
+  })
 }
 
 function putCatCountsInDatabase(cat_counts,date){
@@ -122,7 +125,7 @@ function singleAPICall(date, next_date, cat_id, captioned, cat_counts, i, num_co
   )
 
   promise.fail( function (response){
-      alert('Error accessing API: '+response);
+      throw 'Error accessing API: '+response;
     }
   );
 
@@ -162,64 +165,7 @@ function callAPIforDate(date, next_date){
 
 }
 
-/* convertCatCountsToD3 - 
-    Transforms a dictionary of the form
 
-      [ 
-        {
-          'id': 1,
-          'title': 'Animation',
-          'num_captioned': '14',
-          'num_not_captioned': '20'
-        },
-        ...
-      ]
-
-    into a JSON object of the form
-      
-      {
-        "name":"flare",
-        "children": [
-          {
-            "name":"Film & Animation",
-            "children":[
-              {
-                "name":"with annotations",
-                "size":590
-              },
-              {
-                "name":"without annotations",
-                "size":5579
-              }
-            ]
-          },
-          ...
-        ]
-      }
-*/
-function convertCatCountsToD3(cat_counts){
-  d3_dict = {};
-  d3_dict['name']='flare';
-  d3_dict['children'] = [];
-  for (i=0; i<cat_counts.length; i++){
-    cat = cat_counts[i];
-    item = {
-      'name': cat['title']
-    };
-    item['children'] = [ 
-      {
-        'name': 'with annotations',
-        'size': cat['num_captioned']
-      },
-      {
-        'name': 'without annotations',
-        'size': cat['num_not_captioned']
-      }
-    ]
-    d3_dict['children'].push(item);
-  }
-  return JSON.stringify(d3_dict);
-}
 
 /* important in case there are multiple dates in the results */
 
