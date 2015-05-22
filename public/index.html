@@ -10,7 +10,7 @@
 
 <script src="d3canvas.js"></script>
 <script src="helper.js"></script>
-<script src="data_collecting.js"></script>
+<script src="backend_helper.js"></script>
 
 
 <script>
@@ -47,9 +47,36 @@ function checkAndGetDataForInput(){
     next_date.setTime(date.getTime());
     next_date.setDate(next_date.getDate()+1);
 
+    Parse.Cloud.run('getData', {date: date, next_date: next_date}).then(function(results){
+      var num_results = results.length;
+      console.log("Successfully checked database for date range "+date+" - "+next_date+".")
+      var cat_counts;
+
+      if (num_results == 0){
+        console.log("0 items match the query. Will query API instead and store data.");  
+        
+        // get the data, draw visualization when done and store in database
+        cat_counts = callAPIforDate(date,next_date);
+
+        Parse.Cloud.run('putCatCountsInDatabase',{cat_counts: cat_counts,date: date}).then(function(results){
+          console.log('Successfully put in database.';);
+          console.log(results);
+        }, function(error){
+          console.log('Error saving.'+error.message);
+        });
+
+      } else {
+        // got results from database.
+        console.log(num_results+" items match the query.");
+
+        cat_counts = convertDBresultsToCatCounts(results);
+
+      }
+    });
+
+
     var display_type = $('input[name=viewAsOptions]:checked').val();
 
-    Parse.Cloud.run('getData', {date: date, next_date: next_date}).then(function(cat_counts){
       if (display_type == "d3graph"){
 
         var d3_json = convertCatCountsToD3(cat_counts);

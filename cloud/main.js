@@ -1,5 +1,34 @@
 var clean_cats = {"Film & Animation":"1","Autos & Vehicles":"2","Music":"10","Pets & Animals":"15","Sports":"17","Short Movies":"18","Travel & Events":"19","Gaming":"20","Videoblogging":"21","People & Blogs":"22","Comedy":"34","Entertainment":"24","News & Politics":"25","Howto & Style":"26","Education":"27","Science & Technology":"28","Nonprofits & Activism":"29","Movies":"30","Anime/Animation":"31","Action/Adventure":"32","Classics":"33","Documentary":"35","Drama":"36","Family":"37","Foreign":"38","Horror":"39","Sci-Fi/Fantasy":"40","Thriller":"41","Shorts":"42","Shows":"43","Trailers":"44"}
 
+Parse.Cloud.define("putCatCountsInDatabase", function(request, response){
+  var cat_counts = request.params.cat_counts;
+  var date = request.params.date;
+
+  for (var i=0; i<cat_counts.length; i++){
+    // eventually just put this into the code when we're making cat_counts, since it should only be
+    // called when it is a new date
+
+    cat_dict = cat_counts[i];
+    var DayCounts = Parse.Object.extend("DayCounts");
+    var catDayCounts = new DayCounts();
+
+    catDayCounts.set('cat_name',cat_dict['title']);
+    catDayCounts.set('cat_id',parseInt(cat_dict['id']));
+    catDayCounts.set('num_captioned',parseInt(cat_dict['num_captioned']));
+    catDayCounts.set('num_not_captioned',parseInt(cat_dict['num_not_captioned']));
+    catDayCounts.set('date',date);
+    console.log('Stored '+i+'of '+cat_counts.length+': ');
+    catDayCounts.save(null, {
+      success: function(resp){
+        response.success(resp);
+      },
+      error: function(resp){
+        response.error(resp);
+      }
+    })
+  }
+}
+
 Parse.Cloud.define("getData", function(request, response){
   var date = request.params.date;
   var next_date = request.params.next_date;
@@ -11,33 +40,36 @@ Parse.Cloud.define("getData", function(request, response){
 
   //query.lessThan("date",next_date);
   query.find().then(function(results){
-    var num_results = results.length;
-    console.log("Successfully checked database for date range "+date+" - "+next_date+".")
-    if (num_results == 0){
-      console.log("0 items match the query. Will query API instead and store data.");  
+    response.success(results);
+
+    // var num_results = results.length;
+  
+    // console.log("Successfully checked database for date range "+date+" - "+next_date+".")
+    // if (num_results == 0){
+    //   console.log("0 items match the query. Will query API instead and store data.");  
       
-      var APIcallPromise = callAPIforDate(date,next_date);
+    //   var APIcallPromise = callAPIforDate(date,next_date);
 
-      // get the data, store in database, return
-      APIcallPromise.done(function(cat_counts){
-        console.log('cat counts:');
-        console.log(cat_counts);
+    //   // get the data, store in database, return
+    //   APIcallPromise.done(function(cat_counts){
+    //     console.log('cat counts:');
+    //     console.log(cat_counts);
         
-        putCatCountsInDatabase(cat_counts,date);
-        response.success(cat_counts);
-      }); 
+    //     putCatCountsInDatabase(cat_counts,date);
+    //     response.success(cat_counts);
+    //   }); 
 
-      APIcallPromise.fail(function(error){
-        response.error(error);
-      });
+    //   APIcallPromise.fail(function(error){
+    //     response.error(error);
+    //   });
 
-    } else {
-      // got results from database.
-      console.log(num_results+" items match the query.");
+    // } else {
+    //   // got results from database.
+    //   console.log(num_results+" items match the query.");
 
-      var cat_counts = convertDBresultsToCatCounts(results);
-      response.success(cat_counts);
-    }
+    //   var cat_counts = convertDBresultsToCatCounts(results);
+    //   response.success(cat_counts);
+    // }
   })
 
 })
