@@ -5,10 +5,15 @@ function drawChart(json_data){
 	//hiding d3 svg
 	$('svg').remove();
 	$('text-container').hide();
+	
 	//hiding table
 	$('#tableid').remove();
 
-	var include_counts = false;
+	//appending canvas
+	$('#container').append('<canvas id="myChart" width="400" height="400"></canvas>');
 
-	//var chartGraph = ('<canvas id="myChart" width="400" height="400"></canvas>');
+	
+
+
+
 }
