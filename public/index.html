@@ -32,29 +32,41 @@ function checkAndGetDataForInput(){
   try{
     var date = new Date($('input[name=date_field]').val());
 
-    today = new Date();
-    today.setHours(0,0,0,0);
-    if (date.getTime() >= today.getTime()){
-      alert('Error: Pick a date before today.');
-    } else {
-
-      date.setHours(0,0,0,0);
-      date.setDate(date.getDate()+1);
-
-      var next_date = new Date();
-      next_date.setTime(date.getTime());
-      next_date.setDate(next_date.getDate()+1);
-
-      var display_type = $('input[name=viewAsOptions]:checked').val();
-      console.log(display_type);
-
-      getData(date, next_date, display_type);
-
-    }
-
   } catch(err) {
     alert('Error: invalid date');
   }
+  
+  today = new Date();
+  today.setHours(0,0,0,0);
+  if (date.getTime() >= today.getTime()){
+    alert('Error: Pick a date before today.');
+  } else {
+
+    date.setHours(0,0,0,0);
+    date.setDate(date.getDate()+1);
+
+    var next_date = new Date();
+    next_date.setTime(date.getTime());
+    next_date.setDate(next_date.getDate()+1);
+
+    var display_type = $('input[name=viewAsOptions]:checked').val();
+    
+    var dataPromise = getData(date, next_date);
+
+    $.when(dataPromise).done(function(cat_counts){
+      debugger;
+      if (display_type == "d3graph"){
+        var d3_json = convertCatCountsToD3(cat_counts);
+        drawVisualization(d3_json, 700, 500);
+      } else if (display_type == "table"){
+        drawTable(cat_counts);
+      } else {
+        alert('Error in getData: display_type not of valid form [d3graph, table]');
+      }
+    });
+    
+  }
+
 
 
 }

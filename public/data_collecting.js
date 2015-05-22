@@ -1,7 +1,7 @@
 /* either get the desired data from the database, or from the API
 if it's not in the database
 */
-function getData(date, next_date, display_type){
+function getData(date, next_date){
 
   var DayCounts = Parse.Object.extend("DayCounts");
   var query = new Parse.Query(DayCounts);
@@ -11,28 +11,23 @@ function getData(date, next_date, display_type){
   //query.lessThan("date",next_date);
   query.find({
     success: function(results){
-      var count = results.length;
+      var num_results = results.length;
       console.log("Successfully checked database for date range "+date+" - "+next_date+".")
-      if (count == 0){
+      if (num_results == 0){
         console.log("0 items match the query. Will query API instead and store data.");  
         
         // get the data, draw visualization when done and store in database
-        callAPIforDate(date,next_date);
+        var cat_counts = callAPIforDate(date,next_date);
+
+        putCatCountsInDatabase(cat_counts,date);
+        return cat_counts;
         
       } else {
         // got results from database.
-        console.log(count+" items match the query.");
+        console.log(num_results+" items match the query.");
 
         var cat_counts = convertDBresultsToCatCounts(results);
-
-        if (display_type == "d3graph"){
-          var d3_json = convertCatCountsToD3(cat_counts);
-          drawVisualization(d3_json, 700, 500);
-        } else if (display_type == "table"){
-          drawTable(cat_counts);
-        } else {
-          alert('Error in getData: display_type not of valid form [d3graph, table]');
-        }
+        return cat_counts;
 
       }
     },
@@ -63,16 +58,6 @@ function putCatCountsInDatabase(cat_counts,date){
   }
 }
 
-function updateAfterAPICall(cat_counts, date){
-
-  // display data
-  var d3_json = convertCatCountsToD3(cat_counts);
-  drawVisualization(d3_json, 700, 500);
-
-  putCatCountsInDatabase(cat_counts,date)
-  
-}
-
 /* cat_counts is passed by reference */
 function singleAPICall(date, next_date, cat_id, captioned, cat_counts, i, num_completed){
 
@@ -91,16 +76,18 @@ function singleAPICall(date, next_date, cat_id, captioned, cat_counts, i, num_co
     "&type=video&videoCategoryId="+cat_id+
     "&maxResults=0&key=AIzaSyA2qExhE65k0s4SCHl2wwcCWyPdgtoTyFg";
 
-  $.ajax( {
+  var promise = $.ajax( {
     url: api_url,
     index: i,
     date: date,
-    type: 'GET',
-    success: function( response) {
+    type: 'GET'
+  } );
+
+  promise.done( function( response) {
       addData(response,this.index, this.date);
 
       function addData(data, i, date){
-        count = parseInt(data.pageInfo.totalResults);
+        var count = parseInt(data.pageInfo.totalResults);
         console.log(count);
 
         if (count >= 1000000){
@@ -111,25 +98,34 @@ function singleAPICall(date, next_date, cat_id, captioned, cat_counts, i, num_co
           half_date.setTime(date.getTime() + diff/2);
           num_completed['total'] += 1 // since we're adding 2 more calls
 
-          singleAPICall(date, half_date, cat_id, captioned, cat_counts, i, num_completed);
-          singleAPICall(half_date, next_date, cat_id, captioned, cat_counts, i, num_completed);
+          var promise1 = singleAPICall(date, half_date, cat_id, captioned, cat_counts, i, num_completed);
+          var promise2 = singleAPICall(half_date, next_date, cat_id, captioned, cat_counts, i, num_completed);
+
+          $.when(promise1, promise2).done(function(data1, data2){
+            return {
+              'i' : i,
+              'count' : data1['count'] + data2['count'],
+              'capt_key' : data1['capt_key'] 
+            }
+          })
 
         } else {
-
-          cat_counts[i][capt_key] += count;// += in case we had to split in two
-          num_completed['completed'] += 1;
-          if (num_completed['completed'] >= num_completed['total']){
-            updateAfterAPICall(cat_counts, date);
+          return {
+            'i' : i,
+            'count' : count,
+            'capt_key' : capt_key
           }
+        
         }
       }
-    },
-    error: function (response){
-      alert('Error accessing API!');
     }
-  } );
+  )
 
-  return 1; // for counting the number completed
+  promise.fail( function (response){
+      alert('Error accessing API: '+response);
+    }
+  );
+
 }
 
 function callAPIforDate(date, next_date){
@@ -139,6 +135,8 @@ function callAPIforDate(date, next_date){
   // making this a dictionary so it's passed by reference
   num_completed = { 'completed' : 0, 'total' : 2*Object.keys(clean_cats).length };
 
+  var promises = [];
+
   for (var title in clean_cats){
     cat_counts.push({});
     var cat_id = clean_cats[title];
@@ -147,10 +145,20 @@ function callAPIforDate(date, next_date){
     cat_counts[i]['num_captioned'] = 0;
     cat_counts[i]['num_not_captioned'] = 0;
 
-    singleAPICall(date, next_date, cat_id, true, cat_counts, i, num_completed)
-    singleAPICall(date, next_date, cat_id, false, cat_counts, i, num_completed)
+    promises.push(singleAPICall(date, next_date, cat_id, true, cat_counts, i, num_completed));
+    promises.push(singleAPICall(date, next_date, cat_id, false, cat_counts, i, num_completed));
 
   }
+
+  Promise.all(promises).then(function(dataArr){
+    dataArr.forEach(function(data){
+      cat_counts[data['i']][data['capt_key']] += count;
+    });
+
+    return cat_counts;
+  }).catch(function(err){
+    console.log(err);
+  })
 
 }
 
