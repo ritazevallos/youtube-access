@@ -1,6 +1,8 @@
 function drawVisualization(json_data, width, height){
   console.log('drawing d3 visualization');
 
+  $('#myChart').remove();
+
   var radius = Math.min(width, height) / 2.1;
 
   var x = d3.scale.linear()

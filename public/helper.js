@@ -4,6 +4,9 @@ function drawTable(cat_counts){
 	$('svg').remove();
 	$('text-container').hide();
 
+	$('#myChart').remove();
+
+
 	var include_counts = false;
 
 	var $table = $('<table></table>')
