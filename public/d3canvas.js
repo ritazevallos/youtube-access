@@ -39,7 +39,7 @@ function drawVisualization(json_data, width, height){
 
     var g = svg.selectAll("g")
         .data(partition.nodes(root))
-      .enter().append("g");
+        .enter().append("g");
     
     $('#container').fadeTo('slow', 1.0);
 
