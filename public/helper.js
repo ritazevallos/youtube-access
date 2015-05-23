@@ -4,14 +4,17 @@ function drawTable(cat_counts){
   $('svg').remove();
   $('text-container').hide();
 
-  var include_counts = false;
+	$('#myChart').remove();
 
-  var $table = $('<table></table>')
-    .addClass('table')
-    .addClass('table-condensed')
-    .addClass('table-responsive')
-    .addClass('table-hover');
 
+	var include_counts = false;
+
+	var $table = $('<table></table>')
+		.addClass('table')
+		.addClass('table-condensed')
+		.addClass('table-responsive')
+		.addClass('table-hover')
+		.attr('id', 'tableid')
   $table
     .append("<center><caption><h2>Percent Captioned Videos By Category</h2></caption></center>")
     .append("<tr><th scope='col'>Category</th><th scope='col'>% Captioned</th></tr>");
