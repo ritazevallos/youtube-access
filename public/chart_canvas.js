@@ -8,6 +8,7 @@ function drawChart(json_data, category){
 	$('svg').remove();
 	//$('text-container').remove();
     $('#text-container').show();
+    $('#buttons').show();
 	
 	//hiding table
 	$('#tableid').remove();
