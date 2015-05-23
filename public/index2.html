@@ -64,7 +64,7 @@ function checkAndGetDataForInput(){
       } else if (display_type == "table"){
         drawTable(cat_counts);
       } else if (display_type == "chartjs"){
-        drawChart(cat_counts);
+        drawChart(cat_counts, "all");
       } else {
         alert('Error in getData: display_type not of valid form [d3graph, table]');
       }
@@ -138,8 +138,9 @@ $(function(){
       </button>
 
     </div>
-  </div>
-  
+  </div>      
+
+
     <div class="row" id="view_as">
       View as: 
 
