@@ -13,9 +13,10 @@
 <script src="clean_cats.js"></script>
 <script src="d3canvas.js"></script>
 <script src="helper.js"></script>
-<script src="data_collecting.js"></script>
+<script src="backend_helper.js"></script> 
 <script src="cat_counts.js"></script>
 <script src="chart_canvas.js"></script>
+<script src="cat_buttons.js"></script>
 
 
 <script>
@@ -31,9 +32,29 @@ function initializeDateToYesterday(){
   $('input[name=date_field]').val(inp_date);
 }
 
+// Added from Rita
+function displayData(cat_counts){
+  var display_type = $('input[name=viewAsOptions]:checked').val();
+
+  if (display_type == "d3graph"){
+    var d3_json = convertCatCountsToD3(cat_counts);
+    drawVisualization(d3_json, 700, 500);
+  } else if (display_type == "table"){
+    drawTable(cat_counts);
+  } else if (display_type == "chartjs"){
+    addButtons(cat_counts);
+    drawChart(cat_counts, "all");
+  } else {
+    alert('Error in getData: display_type not of valid form [d3graph, table]');
+  }
+}
+
+
 function checkAndGetDataForInput(){
+  var date = new Date();
+
   try{
-    var date = new Date($('input[name=date_field]').val());
+    date = new Date($('input[name=date_field]').val());
 
   } catch(err) {
     alert('Error: invalid date');
@@ -51,48 +72,48 @@ function checkAndGetDataForInput(){
     var next_date = new Date();
     next_date.setTime(date.getTime());
     next_date.setDate(next_date.getDate()+1);
+    Parse.Cloud.run('getData', {date: date, next_date: next_date}).then(function(results){
+      var num_results = results.length;
+      console.log("Successfully checked database for date range "+date+" - "+next_date+".")
 
-    var display_type = $('input[name=viewAsOptions]:checked').val();
-    
-    // var dataPromise = getData(date, next_date);
+      if (num_results == 0){
+        console.log("0 items match the query. Will query API instead and store data.");  
+        
+        // get the data, draw visualization when done and store in database
+        callAPIforDate(date,next_date).then(function(cat_counts){
 
-    // $.when(dataPromise).done(function(cat_counts){
-    //   debugger;
-      if (display_type == "d3graph"){
-        var d3_json = convertCatCountsToD3(cat_counts);
-        drawVisualization(d3_json, 700, 500);
-      } else if (display_type == "table"){
-        drawTable(cat_counts);
-      } else if (display_type == "chartjs"){
-        drawChart(cat_counts, "all");
+          console.log(cat_counts);
+          Parse.Cloud.run('putCatCountsInDatabase',{cat_counts: cat_counts,date: date}).then(function(results){
+            console.log('Successfully put in database.');
+            console.log(results);
+          }, function(error){
+            console.log('Error saving.'+error.message);
+          });
+
+          displayData(cat_counts);
+          
+        }, function(error){
+          console.log('Error calling API: '+error.message);
+        });
+
       } else {
-        alert('Error in getData: display_type not of valid form [d3graph, table]');
+        // got results from database.
+        console.log(num_results+" items match the query.");
+
+        var cat_counts = convertDBresultsToCatCounts(results);
+        displayData(cat_counts);
+
       }
-    // });
-    
+    }, function(error){
+      alert('Error, check console');
+      console.log(error.message);
+    });   
   }
-
-
-
 }
 
 $(function(){
 
   Parse.initialize("5ObGqjM7hqEobYaUiiyb6pQsjvXEkyVoxXwIXtHQ", "4IHI6LXZRjf17xy2IvsRLrSh2nnDJM2hMT3WvBEY");
-
-
-  // todo: GET THAT ^ OUT OF THE VISIBLE CODE?!??!!?
-
-  // var date = new Date();
-  // Parse.Cloud.run('queryYoutubeAPI', { date: date }, {
-  //   success: function(success){
-  //     console.log(success);
-  //   },
-  //   error: function(error) {
-  //     console.log(error);
-  //   }
-  // });
-
 
   initializeDateToYesterday();
 
@@ -105,8 +126,6 @@ $(function(){
     $('#container').fadeTo('slow', 0.20);
     checkAndGetDataForInput();
   })
-
-
 
   checkAndGetDataForInput();
 
