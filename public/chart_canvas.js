@@ -2,9 +2,12 @@
 function drawChart(json_data, category){
 	console.log("drawing chartjs visualization");
 
+    $('#myChart').remove();
+
 	//hiding d3 svg
 	$('svg').remove();
-	$('text-container').remove();
+	//$('text-container').remove();
+    $('#text-container').show();
 	
 	//hiding table
 	$('#tableid').remove();

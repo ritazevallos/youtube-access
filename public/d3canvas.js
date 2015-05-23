@@ -2,6 +2,8 @@ function drawVisualization(json_data, width, height){
   console.log('drawing d3 visualization');
 
   $('#myChart').remove();
+  $('#text-container').show();
+
 
   var radius = Math.min(width, height) / 2.1;
 

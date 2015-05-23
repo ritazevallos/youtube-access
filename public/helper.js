@@ -1,8 +1,10 @@
 /* assume only for one day? */
 function drawTable(cat_counts){
 
+  $('#tableid').remove();
+
   $('svg').remove();
-  $('text-container').hide();
+  $('#text-container').hide();
 
 	$('#myChart').remove();
 
