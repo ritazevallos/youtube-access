@@ -1,5 +1,5 @@
 //new version of d3canvas, to be used with chart.js
-function drawChart(json_data){
+function drawChart(json_data, category){
 	console.log("drawing chartjs visualization");
 
 	//hiding d3 svg
@@ -20,9 +20,13 @@ function drawChart(json_data){
 
 	for (i=0; i<json_data.length; i++){
     	var child = json_data[i];
-
-    	total_captioned += child.num_captioned;
-    	total_uncaptioned += child.num_not_captioned;
+        if(category === "all"){
+    	   total_captioned += child.num_captioned;
+    	   total_uncaptioned += child.num_not_captioned;
+        }else if(child.title === category){
+            total_captioned += child.num_captioned;
+            total_uncaptioned += child.num_not_captioned;
+        }
     }
 
     total = total_captioned + total_uncaptioned;
@@ -48,7 +52,27 @@ function drawChart(json_data){
 	var myNewChart = new Chart(ctx).Doughnut(data, {animateScale : false, scaleShowLabels : true, showTooltips: true,});
 		//adding responsive: true to the options makes the chart change
 			//size with the window
+    changeCenterText(category, total_captioned, total);
 	$('#container').fadeTo('slow', 1.0);
 
+}
 
+function changeCenterText(nameString, total_captioned, total){
+    var percentageString = String((total_captioned/total*100).toFixed(1))+"\%";
+
+    d3.select("#percentage")
+    .text(percentageString);
+
+    d3.select('#genre_name')
+    .text(nameString);
+
+    d3.select("#explanation")
+      .style("visibility", "");
+
+    // var alt_text = "%s of %s videos on Youtube are accessible*"%(percentageString, nameString);
+
+    var alt_text = percentageString + " of " + nameString + " videos on Youtube are accessible";
+
+    console.log(alt_text); 
+    d3.select('#alt_chart_image').attr('alt',alt_text);
 }
