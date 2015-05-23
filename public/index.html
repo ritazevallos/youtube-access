@@ -8,10 +8,11 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://www.parsecdn.com/js/parse-1.3.5.min.js"></script>
 
+
 <script src="d3canvas.js"></script>
 <script src="helper.js"></script>
 <script src="backend_helper.js"></script>
-
+<script src="clean_cats.js"></script>
 
 <script>
 
@@ -26,9 +27,28 @@ function initializeDateToYesterday(){
   $('input[name=date_field]').val(inp_date);
 }
 
+function displayData(cat_counts){
+  var display_type = $('input[name=viewAsOptions]:checked').val();
+
+  if (display_type == "d3graph"){
+
+    var d3_json = convertCatCountsToD3(cat_counts);
+    drawVisualization(d3_json, 700, 500);
+
+  } else if (display_type == "table"){
+
+    drawTable(cat_counts);
+  } else {
+
+    alert('Error in getData: display_type not of valid form [d3graph, table]');
+  }
+}
+
 function checkAndGetDataForInput(){
+  var date = new Date();
+
   try{
-    var date = new Date($('input[name=date_field]').val());
+    date = new Date($('input[name=date_field]').val());
 
   } catch(err) {
     alert('Error: invalid date');
@@ -50,49 +70,39 @@ function checkAndGetDataForInput(){
     Parse.Cloud.run('getData', {date: date, next_date: next_date}).then(function(results){
       var num_results = results.length;
       console.log("Successfully checked database for date range "+date+" - "+next_date+".")
-      var cat_counts;
 
       if (num_results == 0){
         console.log("0 items match the query. Will query API instead and store data.");  
         
         // get the data, draw visualization when done and store in database
-        cat_counts = callAPIforDate(date,next_date);
+        callAPIforDate(date,next_date).then(function(cat_counts){
 
-        Parse.Cloud.run('putCatCountsInDatabase',{cat_counts: cat_counts,date: date}).then(function(results){
-          console.log('Successfully put in database.';);
-          console.log(results);
+          console.log(cat_counts);
+          Parse.Cloud.run('putCatCountsInDatabase',{cat_counts: cat_counts,date: date}).then(function(results){
+            console.log('Successfully put in database.');
+            console.log(results);
+          }, function(error){
+            console.log('Error saving.'+error.message);
+          });
+
+          displayData(cat_counts);
+          
         }, function(error){
-          console.log('Error saving.'+error.message);
+          console.log('Error calling API: '+error.message);
         });
 
       } else {
         // got results from database.
         console.log(num_results+" items match the query.");
 
-        cat_counts = convertDBresultsToCatCounts(results);
+        var cat_counts = convertDBresultsToCatCounts(results);
+        displayData(cat_counts);
 
-      }
-    });
-
-
-    var display_type = $('input[name=viewAsOptions]:checked').val();
-
-      if (display_type == "d3graph"){
-
-        var d3_json = convertCatCountsToD3(cat_counts);
-        drawVisualization(d3_json, 700, 500);
-
-      } else if (display_type == "table"){
-
-        drawTable(cat_counts);
-      } else {
-
-        alert('Error in getData: display_type not of valid form [d3graph, table]');
       }
     }, function(error){
       alert('Error, check console');
       console.log(error.message);
-    })
+    }); 
   }
 }
 

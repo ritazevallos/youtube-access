@@ -1,5 +1,4 @@
 /* important in case there are multiple dates in the results */
-
 function convertDBresultsToCatCounts(results){
   
   console.log('database query results:');
@@ -34,13 +33,16 @@ function convertDBresultsToCatCounts(results){
 
 function callAPIforDate(date, next_date){
 
-  cat_counts = [];
+  var promise = new Parse.Promise();
+
+  var cat_counts = [];
   
   // making this a dictionary so it's passed by reference
   num_completed = { 'completed' : 0, 'total' : 2*Object.keys(clean_cats).length };
 
   var promises = [];
 
+  var i=0;
   for (var title in clean_cats){
     cat_counts.push({});
     var cat_id = clean_cats[title];
@@ -51,24 +53,29 @@ function callAPIforDate(date, next_date){
 
     promises.push(singleAPICall(date, next_date, cat_id, true, cat_counts, i, num_completed));
     promises.push(singleAPICall(date, next_date, cat_id, false, cat_counts, i, num_completed));
-
+    i+=1;
   }
 
   Promise.all(promises).then(function(dataArr){
     dataArr.forEach(function(data){
-      cat_counts[data['i']][data['capt_key']] += count;
+      cat_counts[data['i']][data['capt_key']] += data['count'];
     });
 
-    return cat_counts;
+    promise.resolve(cat_counts);
   }).catch(function(err){
     console.log(err);
+    promise.reject(err);
   })
+
+  return promise;
 
 }
 
 
 /* cat_counts is passed by reference */
 function singleAPICall(date, next_date, cat_id, captioned, cat_counts, i, num_completed){
+
+  var fn_promise = new Parse.Promise();
 
   var capt_str, capt_key;
   if (captioned){
@@ -79,11 +86,13 @@ function singleAPICall(date, next_date, cat_id, captioned, cat_counts, i, num_co
     capt_key = "num_not_captioned";
   }
 
+  var api_key = "AIzaSyA2qExhE65k0s4SCHl2wwcCWyPdgtoTyFg"
+
   var api_url = "https://www.googleapis.com/youtube/v3/search?publishedAfter="+
     date.toJSON() + "&publishedBefore="+next_date.toJSON() +
     "&order=date&part=id&videoCaption="+capt_str+
     "&type=video&videoCategoryId="+cat_id+
-    "&maxResults=0&key=AIzaSyA2qExhE65k0s4SCHl2wwcCWyPdgtoTyFg";
+    "&maxResults=0&key="+api_key;
 
   var promise = $.ajax( {
     url: api_url,
@@ -97,7 +106,6 @@ function singleAPICall(date, next_date, cat_id, captioned, cat_counts, i, num_co
 
       function addData(data, i, date){
         var count = parseInt(data.pageInfo.totalResults);
-        console.log(count);
 
         if (count >= 1000000){
 
@@ -111,19 +119,19 @@ function singleAPICall(date, next_date, cat_id, captioned, cat_counts, i, num_co
           var promise2 = singleAPICall(half_date, next_date, cat_id, captioned, cat_counts, i, num_completed);
 
           $.when(promise1, promise2).done(function(data1, data2){
-            return {
+            fn_promise.resolve( {
               'i' : i,
               'count' : data1['count'] + data2['count'],
               'capt_key' : data1['capt_key'] 
-            }
+            } );
           })
 
         } else {
-          return {
+          fn_promise.resolve( {
             'i' : i,
             'count' : count,
             'capt_key' : capt_key
-          }
+          })
         
         }
       }
@@ -134,5 +142,7 @@ function singleAPICall(date, next_date, cat_id, captioned, cat_counts, i, num_co
       throw 'Error accessing API: '+response;
     }
   );
+
+  return fn_promise;
 
 }
