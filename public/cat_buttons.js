@@ -1,6 +1,6 @@
 /* Make buttons for each category */
 function addButtons(cat_counts){
-
+	noButtons = false;
 	for(i=0; i<cat_counts.length; i++){
 
 		var cat = cat_counts[i];
@@ -19,7 +19,7 @@ function addButtons(cat_counts){
     	$button
     		.append(cat_name);
 
-    	$('#view_as').append($button);
+    	$('#buttons').append($button);
 
 	}
 }

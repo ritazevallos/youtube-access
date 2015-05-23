@@ -2,6 +2,7 @@
 function drawTable(cat_counts){
 
   $('#tableid').remove();
+  $('#buttons').hide();
 
   $('svg').remove();
   $('#text-container').hide();
