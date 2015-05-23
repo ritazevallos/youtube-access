@@ -14,27 +14,6 @@ function drawChart(json_data){
 	
 	//json = JSON.parse(json_data);
 
-	var data = [
-    	{
-        	value: 300,
-        	color:"#F7464A",
-        	highlight: "#FF5A5E",
-        	label: "Red"
-    	},
-    	{
-        	value: 50,
-        	color: "#46BFBD",
-        	highlight: "#5AD3D1",
-        	label: "Green"
-    	},
-    	{
-        	value: 100,
-        	color: "#FDB45C",
-        	highlight: "#FFC870",
-        	label: "Yellow"
-    	}
-	]
-
 	var total = 0;
 	var total_captioned = 0;
 	var total_uncaptioned = 0;
@@ -48,7 +27,7 @@ function drawChart(json_data){
 
     total = total_captioned + total_uncaptioned;
 
-    var data2 = [
+    var data = [
     	{
     		value: total_uncaptioned,
     		color: "#F7464A",
@@ -66,7 +45,7 @@ function drawChart(json_data){
 	// Get context with jQuery - using jQuery's .get() method.
 	var ctx = $("#myChart").get(0).getContext("2d");
 	// This will get the first returned node in the jQuery collection.
-	var myNewChart = new Chart(ctx).Doughnut(data2, {animateScale : false, scaleShowLabels : true, showTooltips: true,});
+	var myNewChart = new Chart(ctx).Doughnut(data, {animateScale : false, scaleShowLabels : true, showTooltips: true,});
 		//adding responsive: true to the options makes the chart change
 			//size with the window
 	$('#container').fadeTo('slow', 1.0);
