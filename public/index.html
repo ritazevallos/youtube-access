@@ -7,12 +7,17 @@
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://www.parsecdn.com/js/parse-1.3.5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.js"></script>
+<!-- <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script> -->
 
-
+<script src="clean_cats.js"></script>
 <script src="d3canvas.js"></script>
 <script src="helper.js"></script>
-<script src="backend_helper.js"></script>
-<script src="clean_cats.js"></script>
+<script src="backend_helper.js"></script> 
+<script src="cat_counts.js"></script>
+<script src="chart_canvas.js"></script>
+<script src="cat_buttons.js"></script>
+
 
 <script>
 
@@ -27,22 +32,23 @@ function initializeDateToYesterday(){
   $('input[name=date_field]').val(inp_date);
 }
 
+// Added from Rita
 function displayData(cat_counts){
   var display_type = $('input[name=viewAsOptions]:checked').val();
 
   if (display_type == "d3graph"){
-
     var d3_json = convertCatCountsToD3(cat_counts);
     drawVisualization(d3_json, 700, 500);
-
   } else if (display_type == "table"){
-
     drawTable(cat_counts);
+  } else if (display_type == "chartjs"){
+    addButtons(cat_counts);
+    drawChart(cat_counts, "all");
   } else {
-
     alert('Error in getData: display_type not of valid form [d3graph, table]');
   }
 }
+
 
 function checkAndGetDataForInput(){
   var date = new Date();
@@ -66,7 +72,6 @@ function checkAndGetDataForInput(){
     var next_date = new Date();
     next_date.setTime(date.getTime());
     next_date.setDate(next_date.getDate()+1);
-
     Parse.Cloud.run('getData', {date: date, next_date: next_date}).then(function(results){
       var num_results = results.length;
       console.log("Successfully checked database for date range "+date+" - "+next_date+".")
@@ -102,7 +107,7 @@ function checkAndGetDataForInput(){
     }, function(error){
       alert('Error, check console');
       console.log(error.message);
-    }); 
+    });   
   }
 }
 
@@ -152,8 +157,9 @@ $(function(){
       </button>
 
     </div>
-  </div>
-  
+  </div>      
+
+
     <div class="row" id="view_as">
       View as: 
 
@@ -162,6 +168,9 @@ $(function(){
       </label>
       <label class="radio-inline">
         <input type="radio" name="viewAsOptions" id="table" value="table" > Table
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="viewAsOptions" id="chart" value="chartjs" > ChartJS Graph
       </label>
     </div>
 
@@ -180,6 +189,7 @@ $(function(){
           </div>
           <!-- the D3 svg gets appended here -->
         </div>
+        <!-- <canvas id="myChart" width="400" height="400"></canvas> -->
       </div>  
 
     </div>
@@ -293,15 +303,15 @@ $(function(){
              <br><br>
               <b>Step 1:</b> Navigate to YouTube's Video Manager, which is found in the Creator Studio.
               <br>
-              <img src="figures/10.PNG" alt="Screenshot of Video Manager location" width = "150" title="YouTube's Video Manager location" style="vertical-align:middle">
+              <img src="figures/10.png" alt="Screenshot of Video Manager location" width = "150" title="YouTube's Video Manager location" style="vertical-align:middle">
               <br><br>
               <b>Step 2:</b> The option to add Subtitles and CC is under the down arrow next to the Edit button of the video you wish to change.
               <br>
-              <img src="figures/1.PNG" alt="Screenshot of Subtitles and CC menu location" width = "250" title="Subtitles and CC menu location" style="vertical-align:middle"> 
+              <img src="figures/1.png" alt="Screenshot of Subtitles and CC menu location" width = "250" title="Subtitles and CC menu location" style="vertical-align:middle"> 
               <br><br>
               <b>Step 3:</b> If you haven't already, you will be prompted to set the most spoken language in the video. 
               <br>
-              <img src="figures/2.PNG" alt="Select video's primary language" width = "250" title="Video language selection" style="vertical-align:middle">
+              <img src="figures/2.png" alt="Select video's primary language" width = "250" title="Video language selection" style="vertical-align:middle">
               <br><br>
               <b>Step 4:</b> Subtitles can be added in whatever language you prefer, using one of three methods:
               <br>
@@ -311,7 +321,7 @@ $(function(){
                 <br>
                 <i>Create new subtitles or CC:</i> finally, you can type out the subtitles line by line and set the timing by hand. 
                 <br>
-                <img src="figures/5.PNG" alt="Screenshot Subtitle/CC options" width = "250" title="Options for adding Subtitles/CC to YouTube videos" style="vertical-align:middle">
+                <img src="figures/5.png" alt="Screenshot Subtitle/CC options" width = "250" title="Options for adding Subtitles/CC to YouTube videos" style="vertical-align:middle">
                 <br><br>
                 
               Congratulations, your video can now reach many more people! 
