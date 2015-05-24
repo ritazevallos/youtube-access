@@ -4,4 +4,8 @@ The **Youtube Accessibility Awareness** project was started at the [EvoHax Web A
 
 Data acquired from the Google Youtube API in real time is displayed as charts using the Chart.js library, showing the percentage of videos that are captioned for those uploaded on a given date. The user can view data for specific dates or break down the amount captioned by specific categories.
 
+## Authors
+
+The project was made by Rita Zevallos, Jonah Schwartz, and Hannah Bown.
+
 [evohax]: http://evohax.com/
