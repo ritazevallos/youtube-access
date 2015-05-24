@@ -42,8 +42,15 @@ function displayData(cat_counts){
   } else if (display_type == "table"){
     drawTable(cat_counts);
   } else if (display_type == "chartjs"){
-    if(noButtons){addButtons(cat_counts);}
-    drawChart(cat_counts, "all");
+
+    addButtons(cat_counts);
+
+    // add click handler to the buttons
+    $('.cat_button').click(function(){
+      var cat_name = $(this).data('cat_name');
+      drawChart(cat_counts, cat_name);
+    });
+    drawChart(cat_counts, "All");
   } else {
     alert('Error in getData: display_type not of valid form [d3graph, table]');
   }
@@ -114,7 +121,6 @@ function checkAndGetDataForInput(){
 $(function(){
 
   Parse.initialize("5ObGqjM7hqEobYaUiiyb6pQsjvXEkyVoxXwIXtHQ", "4IHI6LXZRjf17xy2IvsRLrSh2nnDJM2hMT3WvBEY");
-  noButtons = true;
   initializeDateToYesterday();
 
   $('input[name=date_field]').change(function(){
@@ -159,8 +165,6 @@ $(function(){
 
     </div>
   </div>      
-    <div id="buttons">
-    </div>
 
     <div class="row" id="view_as">
       View as: 
@@ -197,6 +201,8 @@ $(function(){
     </div>
 
 
+    <div class="col-md-3" id="buttons">
+    </div>
 
 
     <!-- <div class="col-md-3"> -->

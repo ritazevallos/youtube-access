@@ -1,6 +1,9 @@
 /* Make buttons for each category */
 function addButtons(cat_counts){
-	noButtons = false;
+	$('.cat_buttons').remove();
+
+	addButton("All");
+
 	for(i=0; i<cat_counts.length; i++){
 
 		var cat = cat_counts[i];
@@ -12,14 +15,23 @@ function addButtons(cat_counts){
 			continue;
 		}
 
-    	var $button = $('<button></button>')
-    		.addClass('button')
-    		.attr('id', 'buttonid')
-    		.attr('onclick', 'drawChart(cat_counts, cat_name)')
-    	$button
-    		.append(cat_name);
-
-    	$('#buttons').append($button);
+		addButton(cat_name);
 
 	}
+}
+
+function addButton(cat_name){
+	var $button = $('<button></button>')
+		.addClass('cat_button')
+		.addClass('btn')
+		.addClass('btn-default')
+		.addClass('btn-sm')
+		.addClass('btn-block')
+		.attr('id', 'buttonid')
+		.data('cat_name',cat_name);
+
+	$button
+		.append(cat_name);
+
+	$('#buttons').append($button);
 }

@@ -24,7 +24,7 @@ function drawChart(json_data, category){
 
 	for (i=0; i<json_data.length; i++){
     	var child = json_data[i];
-        if(category === "all"){
+        if(category === "All"){
     	   total_captioned += child.num_captioned;
     	   total_uncaptioned += child.num_not_captioned;
         }else if(child.title === category){
