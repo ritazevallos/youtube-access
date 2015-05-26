@@ -23,7 +23,7 @@ Parse.Cloud.define("putCatCountsInDatabase", function(request, response){
     promises.push(catDayCounts.save());
   }
 
-  Promise.all(promises).then(function(dataArr){
+  Parse.Promise.when(promises).then(function(dataArr){
     response.success(dataArr);
   }, function(error){
     response.error(error);
@@ -46,7 +46,7 @@ Parse.Cloud.define("getData", function(request, response){
 
 })
 
-
+/**** THESE FUNCTIONS ARE OLD DON'T DO THAT ***/
 /* cat_counts is passed by reference */
 function singleAPICall(date, next_date, cat_id, captioned, cat_counts, i, num_completed){
 

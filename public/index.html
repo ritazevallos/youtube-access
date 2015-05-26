@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
-<link rel="stylesheet" type="text/css" href="style.css">
 <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="style.css"> <!-- important to have this after bootstrap -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -143,43 +143,56 @@ $(function(){
 </head>
 <body>
 <div class="container-fluid">
-  <div class="row vertical-align"> 
-  
-      <div class="btn-group">
 
-      <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#about">
-        About
-      </button>
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Youtube Accessibility Awareness Project</a>
+      </div>
 
-      <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#howto_caption">
-        How to Caption Your Videos
-      </button>  
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
-      <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#resources">
-        Resources
-      </button>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#" data-toggle="modal" data-target="#about">About</li><li><a href="#" data-toggle="modal" data-target="#resources">Resources</a></li><li><a href="#" data-toggle="modal" data-target="#howto_caption">How to Caption Your Videos</a></li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
 
-    </div>
-  </div>      
 
-    <div class="row" id="view_as">
-      View as: 
-      <label class="radio-inline">
-        <input type="radio" name="viewAsOptions" id="chart" value="chartjs" checked alt="View as ChartJS Graph"> ChartJS Graph
-      </label>
-      <label class="radio-inline">
-        <input type="radio" name="viewAsOptions" id="table" value="table" alt="View as Table"> Table
-      </label>
+  <div class="row"> 
+    <h2>On <input type="date" name="date_field" style="display:inline"></input>,</h2>
+  </div>
+
+  <div class="row" id="view_as">
+    View as: 
+    <label class="radio-inline">
+      <input type="radio" name="viewAsOptions" id="chart" value="chartjs" checked alt="View as ChartJS Graph"> Donut graph
+    </label>
+    <label class="radio-inline">
+      <input type="radio" name="viewAsOptions" id="table" value="table" alt="View as Table"> Table
+    </label>
 <!--       <label class="radio-inline">
-        <input type="radio" name="viewAsOptions" id="d3graph" value="d3graph" checked> Animated pie graph
-      </label> -->
+      <input type="radio" name="viewAsOptions" id="d3graph" value="d3graph" checked> Animated pie graph
+    </label> -->
 
-    </div>
+  </div>
 
   <div class="row vertical-align">
+    
+    <div class="col-md-3" id="buttons">
+    </div>
+
+
     <div class="col-md-9" style="text-align: center"> 
-      
-      <h2>On <input type="date" name="date_field" style="display:inline"></input>,</h2>
       
       <div class="row">
         <div id="container">
@@ -197,11 +210,6 @@ $(function(){
     </div>
 
 
-    <div class="col-md-3" id="buttons">
-    </div>
-
-
-    <!-- <div class="col-md-3"> -->
 
     <!-- Modal -->
     <div class="modal fade" id="resources" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
