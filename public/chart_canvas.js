@@ -38,13 +38,13 @@ function drawChart(json_data, category){
     var data = [
     	{
     		value: total_uncaptioned,
-    		color: "#F7464A",
+    		color: "#00A1F4",
     		highlight: "#FF5A5E",
     		label: "Total Uncaptioned Videos"
     	},
     	{
     		value: total_captioned,
-        	color: "#FDB45C",
+        	color: "#E50000",
         	highlight: "#FFC870",
     		label: "Total Captioned Videos"
     	}
