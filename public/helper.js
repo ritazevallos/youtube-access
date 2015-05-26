@@ -46,6 +46,11 @@ function drawTable(cat_counts){
     cat_name = cat['title'];
     num_captioned = cat['num_captioned'];
     num_not_captioned = cat['num_not_captioned'];
+
+    if (num_captioned == 0 && num_not_captioned == 0){
+      continue;
+    }
+
     total += num_captioned + num_not_captioned;
     total_captioned += num_captioned;
 
