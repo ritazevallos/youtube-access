@@ -1,6 +1,6 @@
 /* Make buttons for each category */
 function addButtons(cat_counts){
-	$('.cat_buttons').remove();
+	$('.cat_button').remove();
 
 	addButton("All");
 
