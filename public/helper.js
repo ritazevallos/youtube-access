@@ -9,8 +9,7 @@ function drawTable(cat_counts){
 
 	$('#myChart').remove();
 
-
-	var include_counts = false;
+	var include_counts = true;
 
 	var $table = $('<table></table>')
 		.addClass('table')
@@ -18,16 +17,26 @@ function drawTable(cat_counts){
 		.addClass('table-responsive')
 		.addClass('table-hover')
 		.attr('id', 'tableid')
-  $table
-    .append("<center><caption><h2>Percent Captioned Videos By Category</h2></caption></center>")
-    .append("<tr><th scope='col'>Category</th><th scope='col'>% Captioned</th></tr>");
+    .append("<caption><center><h2>Percent Captioned Videos By Category</h2></center></caption>");
+
+  var $table_body = $('<tbody></tbody>');
+  $table.append($table_body); 
+
+  var top_row_str = "<tr><th scope='col'>Category</th>";
+
+  if (include_counts){
+    top_row_str += "<th scope='col'>Captioned</th>";
+    top_row_str +="<th scope='col'>Not Captioned</th>";
+  }
+
+  top_row_str += "<th scope='col'>% Captioned</th>";
+
+  top_row_str+=("</tr>");
+
+  $table_body
+    .append(top_row_str);
 
 
-  // if (include_counts){
-  //  $table
-  //    .append("<th scope='col'>Captioned</th>")
-  //    .append("<th scope='col'>Not Captioned</th>");
-  // }
 
   var total_captioned = 0;
   var total = 0;
@@ -48,17 +57,28 @@ function drawTable(cat_counts){
       var $row = $("<tr></tr>")
         .append("<td scope='row'>"+cat_name+"</td>");
 
-      $row.append("<td>"+percentage+" %</td>");
-      $table.append($row);
 
       if (include_counts){
         $row.append("<td>"+num_captioned+"</td><td>"+num_not_captioned+"</td>");
       }
 
+      $row.append("<td>"+percentage+" %</td>");
+      $table_body.append($row);
+
+
   }
 
   var total_percentage = (total_captioned/total*100).toFixed(1);
-  $table.append("<tr class='info'><td><b>Total</b></td><td><b>"+total_percentage+" %</b></td></tr>");
+  var total_uncaptioned = total - total_captioned;
+  var last_row_str = "<tr class='info'><td><b>Total</b></td>";
+
+  if (include_counts){
+    last_row_str += "<td>"+total_captioned+"</td><td>"+total_uncaptioned+"</td>";
+  }
+
+  last_row_str += "<td><b>"+total_percentage+" %</b></td></tr>";
+
+  $table_body.append(last_row_str);
 
   $('#container').append($table);
     $('#container').fadeTo('slow', 1.0);
