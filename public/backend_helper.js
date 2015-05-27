@@ -58,18 +58,20 @@ function getDataForDateRange(startdate, enddate){
 
     db_promise.then(function(results){
       var num_results = results.length;
-      console.log("Successfully checked database for date " + cur_date + ".");
+      console.log("Checked database for date " + cur_date + ".");
 
       if (num_results == 0){
-        console.log("0 items match the query. Will query API instead and store data.");  
+        console.log("0 items match the query. Will check API for data and store data.");  
         
         var api_promise = callAPIforDate(cur_date);
         promises.push(api_promise);
 
         api_promise.then(function(count){
 
+          console.log("Retrieved "+count.length+" items from API for date "+cur_date+".");
+
           Parse.Cloud.run('putCatCountsInDatabase',{cat_counts: count,date: cur_date}).then(function(results){
-            console.log('Successfully put in database.');
+            console.log('Successfully put '+results.length+' items in database.');
             }, function(error){
             console.log('Error saving.'+error.message);
           });
@@ -110,7 +112,6 @@ function getDataForDateRange(startdate, enddate){
   }
 
   Promise.all(promises).then(function(dataArr){
-    debugger;
     promise.resolve(cat_counts);
   })
 
