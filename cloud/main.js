@@ -19,7 +19,7 @@ Parse.Cloud.define("putCatCountsInDatabase", function(request, response){
     catDayCounts.set('num_captioned',parseInt(cat_dict['num_captioned']));
     catDayCounts.set('num_not_captioned',parseInt(cat_dict['num_not_captioned']));
     catDayCounts.set('date',date);
-    console.log('Stored '+i+'of '+cat_counts.length+': ');
+    console.log('Stored '+i+' of '+cat_counts.length+': ');
     promises.push(catDayCounts.save());
   }
 

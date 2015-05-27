@@ -88,7 +88,7 @@ function checkAndGetDataForInput(){
     date.setDate(date.getDate()+1);
 
     enddate.setHours(0,0,0,0);
-    enddate.setDate(date.getDate()+1);
+    enddate.setDate(enddate.getDate()+1);
 
     getDataForDateRange(date,enddate).then(function(cat_counts){
       displayData(cat_counts);
