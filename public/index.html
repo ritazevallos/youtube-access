@@ -30,6 +30,7 @@ function initializeDateToYesterday(){
   inp_date = date.toISOString().substring(0, 10);
 
   $('input[name=date_field]').val(inp_date);
+  $('input[name=next_date_field]').val(inp_date);
 }
 
 // Added from Rita
@@ -68,6 +69,10 @@ function checkAndGetDataForInput(){
   } catch(err) {
     alert('Error: invalid date');
   }
+
+  if (isNaN( date.getTime()) || isNaN( enddate.getTime())){
+    alert('Error: invalid date');
+  }
   
   today = new Date();
   today.setHours(0,0,0,0);
@@ -82,8 +87,12 @@ function checkAndGetDataForInput(){
     date.setHours(0,0,0,0);
     date.setDate(date.getDate()+1);
 
+    enddate.setHours(0,0,0,0);
+    enddate.setDate(date.getDate()+1);
 
-    getDataForDateRange(date,enddate).then(function(cat_counts){}, function(error){
+    getDataForDateRange(date,enddate).then(function(cat_counts){
+      displayData(cat_counts);
+    }, function(error){
         console.log('Error calling API: '+error.message);
       });
   }

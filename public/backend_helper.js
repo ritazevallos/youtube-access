@@ -1,7 +1,6 @@
 /* important in case there are multiple dates in the results */
 function convertDBresultsToCatCounts(results){
   
-  console.log('database query results:');
 
   var cat_counts = [];
   var cc_indices = {}; // initialize a map between cat names and indices in the cat_counts array
@@ -19,7 +18,6 @@ function convertDBresultsToCatCounts(results){
 
   for (var i=0; i<results.length; i++){
     var result = results[i].toJSON();
-    console.log(result);
     var index = cc_indices[result['cat_name']];
     cat_counts[index]['num_captioned'] += result['num_captioned'];
     cat_counts[index]['num_not_captioned'] += result['num_not_captioned'];
@@ -28,36 +26,49 @@ function convertDBresultsToCatCounts(results){
   return cat_counts;
 }
 
+function initializeCatCounts(){
+
+  var cat_counts = [];
+
+  for (var i=0; i<Object.keys(clean_cats).length; i++){
+    var title = Object.keys(clean_cats)[i];
+    cat_counts.push({});
+    cat_counts[i]['title'] = title;
+    cat_counts[i]['id'] = clean_cats[title];
+    cat_counts[i]['num_captioned'] = 0;
+    cat_counts[i]['num_not_captioned'] = 0;
+  }
+
+  return cat_counts;
+}
 
 function getDataForDateRange(startdate, enddate){
 
-  var promise = new Promise();
+  var promise = new Parse.Promise();
 
-  var days = (enddate - startdate)/86400000;
-  var count = [];
-  var cat_counts = [];
+  var cat_counts = initializeCatCounts();
 
   var promises = [];
 
   for (var cur_date = startdate; cur_date <= enddate; cur_date.setDate(cur_date.getDate()+1)){
 
-    var db_promise = Parse.Cloud.run('getData', {date: date});
+    var db_promise = Parse.Cloud.run('getData', {date: cur_date});
 
     promises.push(db_promise);
 
     db_promise.then(function(results){
       var num_results = results.length;
-      console.log("Successfully checked database for date "+date+".");
+      console.log("Successfully checked database for date " + cur_date + ".");
 
       if (num_results == 0){
         console.log("0 items match the query. Will query API instead and store data.");  
         
-        var api_promise = callAPIforDate(date,next_date);
+        var api_promise = callAPIforDate(cur_date);
         promises.push(api_promise);
 
         api_promise.then(function(count){
 
-          Parse.Cloud.run('putCatCountsInDatabase',{cat_counts: count,date: date}).then(function(results){
+          Parse.Cloud.run('putCatCountsInDatabase',{cat_counts: count,date: cur_date}).then(function(results){
             console.log('Successfully put in database.');
             }, function(error){
             console.log('Error saving.'+error.message);
@@ -66,7 +77,7 @@ function getDataForDateRange(startdate, enddate){
           if (cat_counts == []){
             cat_counts = count;
           } else {
-            for (var i = 0; i < count.length(); i++){
+            for (var i = 0; i < count.length; i++){
               cat_counts[i].num_captioned += count[i].num_captioned;
               cat_counts[i].num_not_captioned += count[i].num_not_captioned;
             }
@@ -84,7 +95,8 @@ function getDataForDateRange(startdate, enddate){
         if (cat_counts == []){
           cat_counts = count;
         } else {
-          for (var i = 0; i < count.length(); i++){
+          for (var i = 0; i < count.length; i++){
+
             cat_counts[i].num_captioned += count[i].num_captioned;
             cat_counts[i].num_not_captioned += count[i].num_not_captioned;
           }
@@ -98,8 +110,9 @@ function getDataForDateRange(startdate, enddate){
   }
 
   Promise.all(promises).then(function(dataArr){
+    debugger;
     promise.resolve(cat_counts);
-  }
+  })
 
   return promise;
 
