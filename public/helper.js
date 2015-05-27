@@ -11,7 +11,7 @@ function drawTable(cat_counts){
 
 	var include_counts = true;
 
-	var $table = $('<table style="margin-left:35em"></table>')
+	var $table = $('<table style="margin-left:20em"></table>')
 		.addClass('table')
 		.addClass('table-condensed')
 		.addClass('table-responsive')
