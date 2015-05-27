@@ -29,6 +29,40 @@ function convertDBresultsToCatCounts(results){
 }
 
 
+function callAPIforDateRange(startdate, enddate){
+
+  var days = enddate - startdate;
+  var count = [];
+  var next_date = new Date();
+  var cur_date = startdate;
+
+  for(int i = 1; i < days; i++){
+    next_date = new Date(86400000 +Date.parse(cur_date))
+
+    callAPIforDate(date,next_date).then(function(count){
+
+      console.log(counts);
+      Parse.Cloud.run('putCatCountsInDatabase',{counts: counts,date: date}).then(function(results){
+        console.log('Successfully put in database.');
+        console.log(results);
+      }, function(error){
+        console.log('Error saving.'+error.message);
+      });
+
+      //TODO: NEED TO COMBINE ALL THE COUNTS SOMEHOW!!!!
+
+      displayData(cat_counts);
+    
+    }, function(error){
+      console.log('Error calling API: '+error.message);
+    });
+
+    cur_date = next_date;
+
+
+  }
+
+}
 
 
 function callAPIforDate(date, next_date){
