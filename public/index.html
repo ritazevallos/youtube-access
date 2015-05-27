@@ -2,11 +2,9 @@
 <meta charset="utf-8">
 <head>
 <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="bootstrap-switch.min.css">
 <link rel="stylesheet" type="text/css" href="style.css"> <!-- important to have this after bootstrap -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script src="bootstrap-switch.min.js"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://www.parsecdn.com/js/parse-1.3.5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.js"></script>
@@ -61,9 +59,11 @@ function displayData(cat_counts){
 
 function checkAndGetDataForInput(){
   var date = new Date();
+  var enddate = new Date();
 
   try{
     date = new Date($('input[name=date_field]').val());
+    enddate = new Date($('input[name=next_date_field]').val());
 
   } catch(err) {
     alert('Error: invalid date');
@@ -73,15 +73,19 @@ function checkAndGetDataForInput(){
   today.setHours(0,0,0,0);
   if (date.getTime() >= today.getTime()){
     alert('Error: Pick a date before today.');
+  } else if (enddate.getTime() < date.getTime()){
+    alert('Error: End date must be after start date.');
   } else {
+
+    //THIS IS WHERE JONAH WAS WORKING
 
     date.setHours(0,0,0,0);
     date.setDate(date.getDate()+1);
 
-    var next_date = new Date();
-    next_date.setTime(date.getTime());
-    next_date.setDate(next_date.getDate()+1);
-    
+
+    getDataForDateRange(date,enddate).then(function(cat_counts){}, function(error){
+        console.log('Error calling API: '+error.message);
+      });
   }
 }
 
@@ -160,11 +164,11 @@ $(function(){
 
   <div class="row vertical-align">
     
-    <div class="col-md-3" id="buttons">
+    <div class="col-md-3 col-md-offset-2" id="buttons" style="width:15em">
     </div>
 
 
-    <div class="col-md-9" style="text-align: center"> 
+    <div class="col-md-6" style="text-align: center"> 
       
       <div class="row">
         <div id="container">
