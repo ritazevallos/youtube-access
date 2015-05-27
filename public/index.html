@@ -61,9 +61,11 @@ function displayData(cat_counts){
 
 function checkAndGetDataForInput(){
   var date = new Date();
+  var enddate = new Date();
 
   try{
     date = new Date($('input[name=date_field]').val());
+    enddate = new Date($('input[name=next_date_field]').val());
 
   } catch(err) {
     alert('Error: invalid date');
@@ -73,14 +75,16 @@ function checkAndGetDataForInput(){
   today.setHours(0,0,0,0);
   if (date.getTime() >= today.getTime()){
     alert('Error: Pick a date before today.');
+  } else if (enddate.getTime() <= date.getTime()){
+    alert('Error: End date must be after start date.');
   } else {
 
     date.setHours(0,0,0,0);
     date.setDate(date.getDate()+1);
 
-    var next_date = new Date();
-    next_date.setTime(date.getTime());
-    next_date.setDate(next_date.getDate()+1);
+    // var next_date = new Date();
+    // next_date.setTime(date.getTime());
+    // next_date.setDate(next_date.getDate()+1);
     Parse.Cloud.run('getData', {date: date, next_date: next_date}).then(function(results){
       var num_results = results.length;
       console.log("Successfully checked database for date range "+date+" - "+next_date+".")
@@ -89,20 +93,10 @@ function checkAndGetDataForInput(){
         console.log("0 items match the query. Will query API instead and store data.");  
         
         // get the data, draw visualization when done and store in database
-        callAPIforDate(date,next_date).then(function(cat_counts){
-
-          console.log(cat_counts);
-          Parse.Cloud.run('putCatCountsInDatabase',{cat_counts: cat_counts,date: date}).then(function(results){
-            console.log('Successfully put in database.');
-            console.log(results);
+        getDataForDateRange(date,enddate).then(function(cat_counts){
+            return cat_counts
           }, function(error){
-            console.log('Error saving.'+error.message);
-          });
-
-          displayData(cat_counts);
-          
-        }, function(error){
-          console.log('Error calling API: '+error.message);
+            console.log('Error calling API: '+error.message);
         });
 
       } else {
