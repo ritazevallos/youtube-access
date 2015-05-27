@@ -2,9 +2,11 @@
 <meta charset="utf-8">
 <head>
 <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="bootstrap-switch.min.css">
 <link rel="stylesheet" type="text/css" href="style.css"> <!-- important to have this after bootstrap -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="bootstrap-switch.min.js"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://www.parsecdn.com/js/parse-1.3.5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.js"></script>
@@ -121,6 +123,7 @@ function checkAndGetDataForInput(){
 $(function(){
 
   Parse.initialize("5ObGqjM7hqEobYaUiiyb6pQsjvXEkyVoxXwIXtHQ", "4IHI6LXZRjf17xy2IvsRLrSh2nnDJM2hMT3WvBEY");
+
   initializeDateToYesterday();
 
   $('input[name=date_field]').change(function(){
@@ -163,29 +166,31 @@ $(function(){
         <ul class="nav navbar-nav navbar-right">
           <li><a href="#" data-toggle="modal" data-target="#about">About</li><li><a href="#" data-toggle="modal" data-target="#resources">Resources</a></li><li><a href="#" data-toggle="modal" data-target="#howto_caption">How to Caption Your Videos</a></li>
         </ul>
+
+        <form class="navbar-form navbar-right" id="view_as">
+          <small><b>View as: &nbsp;</b></small>
+          <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-primary active">
+              <input type="radio" name="viewAsOptions" id="chart" value="chartjs" alt="View as ChartJS Graph" autocomplete="off" checked> Donut graph
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="viewAsOptions" id="table" value="table"autocomplete="off" alt="View as Table"> Table
+            </label>
+          </div>
+        </form>
+
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
   </nav>
 
-
-  <div class="row"> 
-    <form class="form-inline">
-    <h2>On <input type="date" class="form-control input-lg" name="date_field" style="display:inline" required="required"></input>,</h2>
-    </form>
+  <div class="row text-center">
+    <h2>Percent Captioned Videos By Category</h2>
   </div>
 
-  <div class="row" id="view_as">
-    View as: 
-    <label class="radio-inline">
-      <input type="radio" name="viewAsOptions" id="chart" value="chartjs" checked alt="View as ChartJS Graph"> Donut graph
-    </label>
-    <label class="radio-inline">
-      <input type="radio" name="viewAsOptions" id="table" value="table" alt="View as Table"> Table
-    </label>
-<!--       <label class="radio-inline">
-      <input type="radio" name="viewAsOptions" id="d3graph" value="d3graph" checked> Animated pie graph
-    </label> -->
-
+  <div class="row text-center"> 
+    <form class="form-inline">
+    <input type="date" class="form-control input-lg" name="date_field" style="display:inline" required="required"></input> to <input type="date" class="form-control input-lg" name="next_date_field" style="display:inline" required="required"></input>
+    </form>
   </div>
 
   <div class="row vertical-align">

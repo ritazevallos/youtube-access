@@ -16,8 +16,7 @@ function drawTable(cat_counts){
 		.addClass('table-condensed')
 		.addClass('table-responsive')
 		.addClass('table-hover')
-		.attr('id', 'tableid')
-    .append("<caption><center><h2>Percent Captioned Videos By Category</h2></center></caption>");
+		.attr('id', 'tableid');
 
   var $table_body = $('<tbody></tbody>');
   $table.append($table_body); 
@@ -36,10 +35,8 @@ function drawTable(cat_counts){
   $table_body
     .append(top_row_str);
 
-
-
-  var total_captioned = 0;
-  var total = 0;
+  var total_captioned = 0.0;
+  var total = 0.0;
 
   for (var i=0; i<cat_counts.length; i++){
     cat = cat_counts[i];
@@ -54,8 +51,8 @@ function drawTable(cat_counts){
     total += num_captioned + num_not_captioned;
     total_captioned += num_captioned;
 
-    var percentage = 0;
-    if (num_not_captioned > 0){
+    var percentage = 0.0;
+    if (num_captioned > 0){
         percentage = (num_captioned/(num_captioned+num_not_captioned)*100).toFixed(1);
       }
 
