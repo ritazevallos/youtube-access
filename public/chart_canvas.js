@@ -14,7 +14,7 @@ function drawChart(json_data, category){
 	$('#tableid').remove();
 
 	//appending canvas
-	$('#container').append('<canvas id="myChart" width="400" height="400"></canvas>');
+	$('#container').append('<canvas id="myChart" width="500" height="500"></canvas>');
 	
 	//json = JSON.parse(json_data);
 
