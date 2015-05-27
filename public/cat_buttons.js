@@ -9,8 +9,6 @@ function addButtons(cat_counts){
 		var cat = cat_counts[i];
 		cat_name = cat['title'];
 
-		console.log(cat_name);
-
 		if(cat['num_captioned'] == 0 && cat['num_not_captioned'] == 0){
 			continue;
 		}

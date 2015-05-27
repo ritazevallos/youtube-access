@@ -44,6 +44,8 @@ function initializeCatCounts(){
 
 function getDataForDateRange(startdate, enddate){
 
+  console.log('Calling getDataForDateRange for startdate='+startdate+', enddate='+enddate);
+
   var promise = new Parse.Promise();
 
   var cat_counts = initializeCatCounts();
@@ -108,6 +110,7 @@ function getDataForDateRange(startdate, enddate){
     }, function(error){
       promise.reject(error);
     });   
+
 
   }
 
