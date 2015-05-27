@@ -37,7 +37,7 @@ function callAPIforDateRange(startdate, enddate){
 
   for(var cur_date = startdate; cur_date <= enddate; cur_date.setDate(cur_date.getDate()+1)){
     
-    callAPIforDate(date).then(function(count){
+    callAPIforDate(cur_date).then(function(count){
 
       console.log(count);
       Parse.Cloud.run('putCatCountsInDatabase',{count: count,date: date}).then(function(results){
