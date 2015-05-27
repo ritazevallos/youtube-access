@@ -32,8 +32,11 @@ Parse.Cloud.define("putCatCountsInDatabase", function(request, response){
 
 Parse.Cloud.define("getData", function(request, response){
   var date = request.params.date;
-  var next_date = request.params.next_date;
-
+  var next_date = new Date();
+  next_date.setHours(0,0,0,0);  
+  next_date.setTime(date.getTime());
+  next_date.setDate(next_date.getDate()+1);
+  
   var DayCounts = Parse.Object.extend("DayCounts");
   var query = new Parse.Query(DayCounts);
   query.descending("num_not_captioned");

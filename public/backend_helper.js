@@ -29,40 +29,79 @@ function convertDBresultsToCatCounts(results){
 }
 
 
-function callAPIforDateRange(startdate, enddate){
+function getDataForDateRange(startdate, enddate){
+
+  var promise = new Promise();
 
   var days = (enddate - startdate)/86400000;
   var count = [];
   var cat_counts = [];
 
-  for(var cur_date = startdate; cur_date <= enddate; cur_date.setDate(cur_date.getDate()+1)){
+  var promises = [];
+
+  for (var cur_date = startdate; cur_date <= enddate; cur_date.setDate(cur_date.getDate()+1)){
+
+    var db_promise = Parse.Cloud.run('getData', {date: date});
+
+    promises.push(db_promise);
+
+    db_promise.then(function(results){
+      var num_results = results.length;
+      console.log("Successfully checked database for date "+date+".");
+
+      if (num_results == 0){
+        console.log("0 items match the query. Will query API instead and store data.");  
+        
+        var api_promise = callAPIforDate(date,next_date);
+        promises.push(api_promise);
+
+        api_promise.then(function(count){
+
+          Parse.Cloud.run('putCatCountsInDatabase',{cat_counts: count,date: date}).then(function(results){
+            console.log('Successfully put in database.');
+            }, function(error){
+            console.log('Error saving.'+error.message);
+          });
+
+          if (cat_counts == []){
+            cat_counts = count;
+          } else {
+            for (var i = 0; i < count.length(); i++){
+              cat_counts[i].num_captioned += count[i].num_captioned;
+              cat_counts[i].num_not_captioned += count[i].num_not_captioned;
+            }
+          }
     
-    callAPIforDate(cur_date).then(function(count){
+        }, function(error){
+          promise.reject(error);
+        });
 
-      console.log(count);
-      Parse.Cloud.run('putCatCountsInDatabase',{count: count,date: date}).then(function(results){
-        console.log('Successfully put in database.');
-        console.log(results);
-      }, function(error){
-        console.log('Error saving.'+ error.message);
-      });
-
-      if (cat_counts == []){
-        cat_counts = count;
       } else {
-        for (var i = 0; i < count.length(); i++){
-          cat_counts[i].num_captioned += count[i].num_captioned;
-          cat_counts[i].num_not_captioned += count[i].num_not_captioned;
+        // got results from database.
+        console.log(num_results+" items match the query.");
+
+        var count = convertDBresultsToCatCounts(results);
+        if (cat_counts == []){
+          cat_counts = count;
+        } else {
+          for (var i = 0; i < count.length(); i++){
+            cat_counts[i].num_captioned += count[i].num_captioned;
+            cat_counts[i].num_not_captioned += count[i].num_not_captioned;
+          }
         }
+
       }
-    
     }, function(error){
-      console.log('Error calling API: '+error.message);
-    });
+      promise.reject(error);
+    });   
 
   }
 
-  displayData(cat_counts);
+  Promise.all(promises).then(function(dataArr){
+    promise.resolve(cat_counts);
+  }
+
+  return promise;
 
 }
 
