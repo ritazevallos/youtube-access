@@ -31,36 +31,43 @@ function convertDBresultsToCatCounts(results){
 
 function callAPIforDateRange(startdate, enddate){
 
-  var days = enddate - startdate;
+  var days = enddate - startdate + 1;
   var count = [];
+  var cat_counts = [];
   var next_date = new Date();
   var cur_date = startdate;
 
   for(int i = 1; i < days; i++){
     next_date = new Date(86400000 +Date.parse(cur_date))
-
+    
     callAPIforDate(date,next_date).then(function(count){
 
-      console.log(counts);
-      Parse.Cloud.run('putCatCountsInDatabase',{counts: counts,date: date}).then(function(results){
+      console.log(count);
+      Parse.Cloud.run('putCatCountsInDatabase',{count: count,date: date}).then(function(results){
         console.log('Successfully put in database.');
         console.log(results);
       }, function(error){
         console.log('Error saving.'+error.message);
       });
 
-      //TODO: NEED TO COMBINE ALL THE COUNTS SOMEHOW!!!!
-
-      displayData(cat_counts);
+      if (cat_counts == []){
+        cat_counts = count;
+      } else {
+        for (var i = 0; i < count.length(); i++){
+          cat_count[i].num_captioned += count[i].num_captioned;
+          cat_count[i].num_not_captioned += count[i].num_not_captioned;
+        }
+      }
     
     }, function(error){
       console.log('Error calling API: '+error.message);
     });
 
     cur_date = next_date;
-
-
   }
+
+  displayData(cat_counts);
+
 
 }
 
