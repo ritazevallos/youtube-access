@@ -73,7 +73,7 @@ function getDataForDateRange(startdate, enddate){
           console.log("Retrieved "+count.length+" items from API for date "+cur_date+".");
 
           Parse.Cloud.run('putCatCountsInDatabase',{cat_counts: count,date: cur_date}).then(function(results){
-            console.log('Successfully put '+results.length+' items in database.');
+            console.log('Successfully put items in database.');
             }, function(error){
             console.log('Error saving.'+error.message);
           });

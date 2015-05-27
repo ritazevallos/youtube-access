@@ -11,7 +11,9 @@ function drawTable(cat_counts){
 
 	var include_counts = true;
 
-	var $table = $('<table style="margin-left:20em"></table>')
+  var $div = $('<div class="col-md-12 col-md-offset-6"></div>');
+
+	var $table = $('<table></table>')
 		.addClass('table')
 		.addClass('table-condensed')
 		.addClass('table-responsive')
@@ -82,8 +84,9 @@ function drawTable(cat_counts){
 
   $table_body.append(last_row_str);
 
-  $('#container').append($table);
-    $('#container').fadeTo('slow', 1.0);
+  $('#container').append($div);
+  $div.append($table);
+  $('#container').fadeTo('slow', 1.0);
 }
 
 
