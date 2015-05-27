@@ -31,31 +31,28 @@ function convertDBresultsToCatCounts(results){
 
 function callAPIforDateRange(startdate, enddate){
 
-  var days = enddate - startdate + 1;
+  var days = (enddate - startdate)/86400000;
   var count = [];
   var cat_counts = [];
-  var next_date = new Date();
-  var cur_date = startdate;
 
-  for(int i = 1; i < days; i++){
-    next_date = new Date(86400000 +Date.parse(cur_date))
+  for(var cur_date = startdate; cur_date <= enddate; cur_date.setDate(cur_date.getDate()+1)){
     
-    callAPIforDate(date,next_date).then(function(count){
+    callAPIforDate(date).then(function(count){
 
       console.log(count);
       Parse.Cloud.run('putCatCountsInDatabase',{count: count,date: date}).then(function(results){
         console.log('Successfully put in database.');
         console.log(results);
       }, function(error){
-        console.log('Error saving.'+error.message);
+        console.log('Error saving.'+ error.message);
       });
 
       if (cat_counts == []){
         cat_counts = count;
       } else {
         for (var i = 0; i < count.length(); i++){
-          cat_count[i].num_captioned += count[i].num_captioned;
-          cat_count[i].num_not_captioned += count[i].num_not_captioned;
+          cat_counts[i].num_captioned += count[i].num_captioned;
+          cat_counts[i].num_not_captioned += count[i].num_not_captioned;
         }
       }
     
@@ -63,16 +60,14 @@ function callAPIforDateRange(startdate, enddate){
       console.log('Error calling API: '+error.message);
     });
 
-    cur_date = next_date;
   }
 
   displayData(cat_counts);
 
-
 }
 
 
-function callAPIforDate(date, next_date){
+function callAPIforDate(date){
 
   var promise = new Parse.Promise();
 
@@ -92,8 +87,8 @@ function callAPIforDate(date, next_date){
     cat_counts[i]['num_captioned'] = 0;
     cat_counts[i]['num_not_captioned'] = 0;
 
-    promises.push(singleAPICall(date, next_date, cat_id, true, cat_counts, i, num_completed));
-    promises.push(singleAPICall(date, next_date, cat_id, false, cat_counts, i, num_completed));
+    promises.push(singleAPICall(date, cat_id, true, cat_counts, i, num_completed));
+    promises.push(singleAPICall(date, cat_id, false, cat_counts, i, num_completed));
     i+=1;
   }
 
@@ -114,7 +109,11 @@ function callAPIforDate(date, next_date){
 
 
 /* cat_counts is passed by reference */
-function singleAPICall(date, next_date, cat_id, captioned, cat_counts, i, num_completed){
+function singleAPICall(date, cat_id, captioned, cat_counts, i, num_completed){
+
+  var next_date = new Date();
+  next_date.setTime(date.getTime());
+  next_date.setDate(next_date.getDate()+1));
 
   var fn_promise = new Parse.Promise();
 
