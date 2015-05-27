@@ -113,7 +113,7 @@ function singleAPICall(date, cat_id, captioned, cat_counts, i, num_completed){
 
   var next_date = new Date();
   next_date.setTime(date.getTime());
-  next_date.setDate(next_date.getDate()+1));
+  next_date.setDate(next_date.getDate()+1);
 
   var fn_promise = new Parse.Promise();
 
