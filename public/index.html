@@ -76,7 +76,7 @@ function checkAndGetDataForInput(){
   
   today = new Date();
   today.setHours(0,0,0,0);
-  if (date.getTime() >= today.getTime()){
+  if (date.getTime() >= today.getTime() || enddate.getTime() >= today.getTime()){
     alert('Error: Pick a date before today.');
   } else if (enddate.getTime() < date.getTime()){
     alert('Error: End date must be after start date.');
@@ -105,6 +105,11 @@ $(function(){
   initializeDateToYesterday();
 
   $('input[name=date_field]').change(function(){
+    $('#container').fadeTo('slow', 0.20);
+    checkAndGetDataForInput();
+  })
+
+    $('input[name=next_date_field]').change(function(){
     $('#container').fadeTo('slow', 0.20);
     checkAndGetDataForInput();
   })
