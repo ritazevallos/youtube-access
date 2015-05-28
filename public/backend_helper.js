@@ -51,28 +51,44 @@ function getDataForDateRange(startdate, enddate){
   var cat_counts = initializeCatCounts();
 
   var promises = [];
+  var promiseDict = {};
 
+  var dateArray = [];
   for (var cur_date = startdate; cur_date <= enddate; cur_date.setDate(cur_date.getDate()+1)){
+    dateArray.push(new Date(cur_date.getTime()));
+  }
 
-    var db_promise = Parse.Cloud.run('getData', {date: cur_date});
+
+  for (var i=0; i<dateArray.length; i++){
+
+    var db_promise = Parse.Cloud.run('getData', {date: dateArray[i], i: i});
 
     promises.push(db_promise);
 
-    db_promise.then(function(results){
+    db_promise.then(function(i_and_results){
+      var results = i_and_results.results;
+      var j = i_and_results.i;
+      console.log('dateArray[i] in db_promise');
+      console.log(dateArray[j]);
       var num_results = results.length;
-      console.log("Checked database for date " + cur_date + ".");
+
+      if (dateArray[j]){
+      console.log("Checked database for date " + dateArray[j] + ".");
+      } else {
+        throw "dateArray["+j+"] is undefined.";
+      }
 
       if (num_results == 0){
         console.log("0 items match the query. Will check API for data and store data.");  
         
-        var api_promise = callAPIforDate(cur_date);
+        var api_promise = callAPIforDate(dateArray[j]);
         promises.push(api_promise);
 
         api_promise.then(function(count){
 
-          console.log("Retrieved "+count.length+" items from API for date "+cur_date+".");
+          console.log("Retrieved "+count.length+" items from API for date "+dateArray[j]+".");
 
-          Parse.Cloud.run('putCatCountsInDatabase',{cat_counts: count,date: cur_date}).then(function(results){
+          Parse.Cloud.run('putCatCountsInDatabase',{cat_counts: count,date: dateArray[j]}).then(function(results){
             console.log('Successfully put items in database.');
             }, function(error){
             console.log('Error saving.'+error.message);
@@ -81,9 +97,9 @@ function getDataForDateRange(startdate, enddate){
           if (cat_counts == []){
             cat_counts = count;
           } else {
-            for (var i = 0; i < count.length; i++){
-              cat_counts[i].num_captioned += count[i].num_captioned;
-              cat_counts[i].num_not_captioned += count[i].num_not_captioned;
+            for (var k = 0; k < count.length; k++){
+              cat_counts[k].num_captioned += count[k].num_captioned;
+              cat_counts[k].num_not_captioned += count[k].num_not_captioned;
             }
           }
     
@@ -99,10 +115,10 @@ function getDataForDateRange(startdate, enddate){
         if (cat_counts == []){
           cat_counts = count;
         } else {
-          for (var i = 0; i < count.length; i++){
+          for (var l = 0; l < count.length; l++){
 
-            cat_counts[i].num_captioned += count[i].num_captioned;
-            cat_counts[i].num_not_captioned += count[i].num_not_captioned;
+            cat_counts[l].num_captioned += count[l].num_captioned;
+            cat_counts[l].num_not_captioned += count[l].num_not_captioned;
           }
         }
 

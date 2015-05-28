@@ -19,9 +19,11 @@ Parse.Cloud.define("putCatCountsInDatabase", function(request, response){
     catDayCounts.set('num_captioned',parseInt(cat_dict['num_captioned']));
     catDayCounts.set('num_not_captioned',parseInt(cat_dict['num_not_captioned']));
     catDayCounts.set('date',date);
-    console.log('Stored '+i+' of '+cat_counts.length+': ');
     promises.push(catDayCounts.save());
   }
+
+
+  console.log('Stored '+cat_counts.length+' items.');
 
   Parse.Promise.when(promises).then(function(dataArr){
     response.success(dataArr);
@@ -32,6 +34,10 @@ Parse.Cloud.define("putCatCountsInDatabase", function(request, response){
 
 Parse.Cloud.define("getData", function(request, response){
   var date = request.params.date;
+  var i = request.params.i;
+
+  console.log('\n\n\ngetData date: ');
+  console.log(date.toJSON());
   var next_date = new Date();
   next_date.setHours(0,0,0,0);  
   next_date.setTime(date.getTime());
@@ -44,7 +50,11 @@ Parse.Cloud.define("getData", function(request, response){
 
   //query.lessThan("date",next_date);
   query.find().then(function(results){
-    response.success(results);
+    var i_and_results = {
+      'i': i,
+      'results': results
+    };
+    response.success(i_and_results);
   })
 
 })
