@@ -9,6 +9,6 @@ Data acquired from the Google Youtube API in real time is displayed as charts us
 The project was made by [Rita Zevallos][rita], [Jonah Schwartz][jonah], and [Hannah Bown][hannah].
 
 [evohax]: http://evohax.com/
-[rita]: https://github.com/rzevallos
-[jonah]: https://github.com/jonahjonah
-[hannah]: https://github.com/hbown
+[rita]: https://github.com/ritazevallos/
+[jonah]: https://github.com/jonahjonah/
+[hannah]: https://github.com/hbown/
